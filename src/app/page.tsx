@@ -1272,7 +1272,20 @@ form.reset();
   </div>
 </div>
 
-        <label className="flex items-start gap-3 text-sm text-white/60">
+<div className="rounded-2xl border border-[#C8A96B]/30 bg-[#C8A96B]/10 p-5">
+  <p className="font-semibold text-[#E2D1A2]">
+    Gesetzliches Gewährleistungsrecht
+  </p>
+
+  <p className="mt-2 text-sm leading-relaxed text-white/70">
+    Für Waren besteht ein gesetzliches Gewährleistungsrecht.
+    Dieses gilt grundsätzlich für Mängel, die bereits bei der
+    Übergabe der Ware vorhanden waren. Die gesetzliche
+    Mindestdauer beträgt zwei Jahre.
+  </p>
+</div>
+
+<label className="flex items-start gap-3 text-sm text-white/60">
           <input
             type="checkbox"
             required
@@ -1280,9 +1293,20 @@ form.reset();
           />
 
           <span>
-            Ich bestätige, dass meine Angaben korrekt sind und ich die
-            Bestellung kostenpflichtig absenden möchte.
-          </span>
+  Ich bestätige, dass meine Angaben korrekt sind, ich die
+  <a
+    href="/agb"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="mx-1 text-[#C8A96B] underline underline-offset-4"
+  >
+    AGB
+  </a>
+  gelesen habe und die Bestellung kostenpflichtig absenden möchte.
+  Mir ist bekannt, dass für individuell nach meinen Angaben
+  angefertigte Waren kein gesetzliches Rücktrittsrecht besteht,
+  soweit die Voraussetzungen des § 18 FAGG erfüllt sind.
+</span>
         </label>
         <div className="mb-6 rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
   <p className="mb-4 text-xs uppercase tracking-[0.25em] text-[#C8A96B]">
@@ -1397,14 +1421,23 @@ form.reset();
         <div className="mx-auto flex max-w-6xl flex-col gap-4 text-sm text-white/50 md:flex-row md:items-center md:justify-between">
           <p>© 2026 Nia&apos;s Fantasy</p>
 
-          <div className="flex gap-6">
-            <a href="/impressum" className="hover:text-white">
-              Impressum
-            </a>
-            <a href="/datenschutz" className="hover:text-white">
-              Datenschutz
-            </a>
-          </div>
+          <div className="flex flex-wrap gap-6">
+  <a href="/impressum" className="hover:text-white">
+    Impressum
+  </a>
+
+  <a href="/datenschutz" className="hover:text-white">
+    Datenschutz
+  </a>
+
+  <a href="/agb" className="hover:text-white">
+    AGB
+  </a>
+
+  <a href="/widerruf" className="hover:text-white">
+    Widerruf
+  </a>
+</div>
         </div>
       </footer>
     </main>
