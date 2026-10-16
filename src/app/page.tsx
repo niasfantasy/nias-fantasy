@@ -20,10 +20,20 @@ const [orderStatus, setOrderStatus] = useState<"success" | "error" | "">("");
 const [ageConfirmed, setAgeConfirmed] = useState(false);
 const [ageCheckDone, setAgeCheckDone] = useState(false);
 useEffect(() => {
-  const savedAgeConfirmation = localStorage.getItem("ageConfirmed");
+  const navigationEntry = performance.getEntriesByType(
+    "navigation"
+  )[0] as PerformanceNavigationTiming | undefined;
 
-  if (savedAgeConfirmation === "true") {
-    setAgeConfirmed(true);
+  const isReload = navigationEntry?.type === "reload";
+
+  if (isReload) {
+    sessionStorage.removeItem("ageConfirmed");
+    setAgeConfirmed(false);
+  } else {
+    const savedAgeConfirmation =
+      sessionStorage.getItem("ageConfirmed");
+
+    setAgeConfirmed(savedAgeConfirmation === "true");
   }
 
   setAgeCheckDone(true);
@@ -48,7 +58,13 @@ useEffect(() => {
     };
   });
 };
-
+useEffect(() => {
+  fetch("/api/site-view", {
+    method: "POST",
+  }).catch((error) => {
+    console.error("Seitenaufruf konnte nicht gezählt werden:", error);
+  });
+}, []);
 const totalItems = Object.values(quantities).reduce(
   (sum, quantity) => sum + quantity,
   0
@@ -200,8 +216,8 @@ form.reset();
       <div className="flex flex-col gap-3">
         <button
           type="button"
-         onClick={() => {
-  localStorage.setItem("ageConfirmed", "true");
+        onClick={() => {
+  sessionStorage.setItem("ageConfirmed", "true");
   setAgeConfirmed(true);
 }}
           className="rounded-full bg-[#C8A96B] px-6 py-3 font-semibold text-black transition hover:bg-[#E2D1A2]"
@@ -558,7 +574,7 @@ form.reset();
               </h3>
 
               <p className="mb-8 leading-relaxed text-white/70">
-  Dein persönliches Einzelstück – individuell gestaltet, exklusiv inszeniert und mit Beweisfoto für dich dokumentiert.
+  Dein persönliches Einzelstück – individuell gestaltet, exklusiv inszeniert und fotografisch für dich dokumentiert.
 </p>
              <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
@@ -625,11 +641,11 @@ form.reset();
     </h3>
 
    <p className="mb-3 text-white/80">
-  Dein Name. Mein Moment. Dein personalisiertes Unikat wird von mir Anal verwendet, fotografisch dokumentiert und anschließend an dich versendet.
+  Dein Name. Mein Moment. Dein personalisiertes Unikat wird von mir Anal verwendet, fotografisch dokumentiert und anschließend an dich per Post versendet.
 </p>
 
 <p className="mb-6 text-sm text-white/60">
-  Paketumfang: 1× personalisierte 0,5l Dose + 1× Beweisfoto
+  Paketumfang: 1× personalisierte 0,5l Dose + 1× Proof-Pic via E-Mail
 </p>
 
     <p className="text-2xl font-semibold text-[#C8A96B]">
@@ -691,11 +707,11 @@ form.reset();
     </h3>
 
     <p className="mb-3 text-white/80">
-  Dein Name. Mein Moment. Dein personalisiertes Unikat wird von mir Anal verwendet, fotografisch dokumentiert und anschließend an dich versendet.
+  Dein Name. Mein Moment. Dein personalisiertes Unikat wird von mir Anal verwendet, fotografisch dokumentiert und anschließend an dich per Post versendet.
 </p>
 
 <p className="mb-6 text-sm text-white/60">
-  Paketumfang: 1× personalisierte 0,25l Dose + 1× Beweisfoto
+  Paketumfang: 1× personalisierte 0,25l Dose + 1× Proof-Pic per E-Mail
 </p>
 
     <p className="text-2xl font-semibold text-[#C8A96B]">
@@ -758,11 +774,11 @@ form.reset();
     </h3>
 
     <p className="mb-3 text-white/80">
-  Dein Name. Mein Moment. Dein personalisiertes Unikat wird von mir Anal verwendet, fotografisch dokumentiert und anschließend an dich versendet.
+  Dein Name. Mein Moment. Dein personalisiertes Unikat wird von mir Anal verwendet, fotografisch dokumentiert und anschließend an dich per Post versendet.
 </p>
 
 <p className="mb-6 text-sm text-white/60">
-  Paketumfang: 1× personalisierter Kugelschreiber + 1× Beweisfoto
+  Paketumfang: 1× personalisierter Kugelschreiber + 1× Proof-Pic via E-Mail
 </p>
 
     <p className="text-2xl font-semibold text-[#C8A96B]">
@@ -826,11 +842,11 @@ form.reset();
     </h3>
 
     <p className="mb-3 text-white/80">
-  Dein Name. Mein Moment. Dein personalisiertes Unikat wird von mir Anal verwendet, fotografisch dokumentiert und anschließend an dich versendet.
+  Dein Name. Mein Moment. Dein personalisiertes Unikat wird von mir Anal verwendet, fotografisch dokumentiert und anschließend an dich per Post versendet.
 </p>
 
 <p className="mb-6 text-sm text-white/60">
-  Paketumfang: 1× personalisierte 0,5l PET Flasche + 1× Beweisfoto
+  Paketumfang: 1× personalisierte 0,5l PET Flasche + 1× Proof-Pic via E-Mail
 </p>
 
     <p className="text-2xl font-semibold text-[#C8A96B]">
@@ -896,11 +912,11 @@ form.reset();
     </h3>
 
     <p className="mb-3 text-white/80">
-  Dein Name. Mein Moment. Dein personalisiertes Unikat wird von mir Anal verwendet, fotografisch dokumentiert und anschließend an dich versendet.
+  Dein Name. Mein Moment. Dein personalisiertes Unikat wird von mir Anal verwendet, fotografisch dokumentiert und anschließend an dich per Post versendet.
 </p>
 
 <p className="mb-6 text-sm text-white/60">
-  Paketumfang: 1× personalisierte 1,0l PET Flasche + 1× Beweisfoto
+  Paketumfang: 1× personalisierte 1,0l PET Flasche + 1× Proof-Pic via E-Mail
 </p>
 
     <p className="text-2xl font-semibold text-[#C8A96B]">
@@ -965,11 +981,11 @@ form.reset();
     </h3>
 
     <p className="mb-3 text-white/80">
-  Dein Name. Mein Moment. Dein personalisiertes Unikat wird von mir Anal verwendet, fotografisch dokumentiert und anschließend an dich versendet.
+  Dein Name. Mein Moment. Dein personalisiertes Unikat wird von mir Anal verwendet, fotografisch dokumentiert und anschließend an dich per Post versendet.
 </p>
 
 <p className="mb-6 text-sm text-white/60">
-  Paketumfang: 1× personalisierte 1,5l PET Flasche + 1× Beweisfoto
+  Paketumfang: 1× personalisierte 1,5l PET Flasche + 1× Proof-Pic via E-Mail
 </p>
 
     <p className="text-2xl font-semibold text-[#C8A96B]">
@@ -1415,7 +1431,91 @@ form.reset();
           ))}
         </div>
       </section>
+{/* Q&A */}
+<section className="border-t border-white/10 px-6 py-20 md:px-10 lg:px-16">
+  <div className="mx-auto max-w-4xl">
+    <div className="mb-10 text-center">
+      <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[#C8A96B]">
+        Fragen & Antworten
+      </p>
 
+      <h2 className="text-4xl font-semibold md:text-5xl">
+        Q&A
+      </h2>
+    </div>
+
+    <div className="space-y-4">
+      <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+        <summary className="cursor-pointer font-semibold text-white">
+          Wie läuft die Personalisierung ab?
+        </summary>
+
+        <p className="mt-4 leading-relaxed text-white/65">
+          Du gibst bei deiner Bestellung den gewünschten Namen an.
+          Das Produkt wird individuell für dich vorbereitet und entsprechend
+          der Produktbeschreibung personalisiert.
+        </p>
+      </details>
+
+      <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+        <summary className="cursor-pointer font-semibold text-white">
+          Wie erhalte ich mein Proof-Pic?
+        </summary>
+
+        <p className="mt-4 leading-relaxed text-white/65">
+          Das Proof-Pic wird nach der Anfertigung digital an die bei der
+          Bestellung angegebene E-Mail-Adresse gesendet.
+        </p>
+      </details>
+
+      <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+        <summary className="cursor-pointer font-semibold text-white">
+          Wie lange dauert die Anfertigung?
+        </summary>
+
+        <p className="mt-4 leading-relaxed text-white/65">
+          Da jedes personalisierte Produkt individuell angefertigt wird,
+          kann die Bearbeitungszeit variieren. Über den Versand wirst du
+          per E-Mail informiert.
+        </p>
+      </details>
+
+      <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+        <summary className="cursor-pointer font-semibold text-white">
+          Wie erfolgt der Versand?
+        </summary>
+
+        <p className="mt-4 leading-relaxed text-white/65">
+          Der Versand erfolgt diskret an die von dir angegebene Lieferadresse.
+          Die Versandkosten werden dir vor Abschluss der Bestellung angezeigt.
+        </p>
+      </details>
+
+      <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+        <summary className="cursor-pointer font-semibold text-white">
+          Kann ich meine Bestellung widerrufen?
+        </summary>
+
+        <p className="mt-4 leading-relaxed text-white/65">
+          Bei individuell nach deinen Angaben angefertigten Waren kann das
+          gesetzliche Rücktrittsrecht ausgeschlossen sein. Weitere
+          Informationen findest du in den AGB und auf der Widerrufsseite.
+        </p>
+      </details>
+
+      <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+        <summary className="cursor-pointer font-semibold text-white">
+          Muss ich mindestens 18 Jahre alt sein?
+        </summary>
+
+        <p className="mt-4 leading-relaxed text-white/65">
+          Ja. Das Angebot von Nia&apos;s Fantasy richtet sich ausschließlich
+          an volljährige Personen.
+        </p>
+      </details>
+    </div>
+  </div>
+</section>
       {/* FOOTER */}
       <footer className="border-t border-white/10 px-6 pb-20 pt-8 md:px-10 md:pb-12 lg:px-16">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 text-sm text-white/50 md:flex-row md:items-center md:justify-between">

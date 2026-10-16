@@ -10,6 +10,7 @@ const [statusFilter, setStatusFilter] = useState("alle");
 const [sortOrder, setSortOrder] = useState("neueste");
 const [searchTerm, setSearchTerm] = useState("");
 const [expenses, setExpenses] = useState<any[]>([]);
+const [siteViews, setSiteViews] = useState(0);
 const [expenseDate, setExpenseDate] = useState("");
 const [expenseCategory, setExpenseCategory] = useState("");
 const [expenseDescription, setExpenseDescription] = useState("");
@@ -50,6 +51,7 @@ useEffect(() => {
     method: "GET",
   });
 
+
   const result = await response.json();
 
   if (response.ok) {
@@ -62,6 +64,22 @@ useEffect(() => {
   }
 };
 
+const loadSiteViews = async () => {
+  const response = await fetch("/api/admin-site-stats", {
+    method: "GET",
+  });
+
+  const result = await response.json();
+
+  if (response.ok) {
+    setSiteViews(Number(result.views || 0));
+  } else {
+    setMessage(
+      result.error ||
+        "Seitenaufrufe konnten nicht geladen werden."
+    );
+  }
+};
  loadOrders();
 loadExpenses();
 }, [loggedIn]);
@@ -416,7 +434,16 @@ if (loggedIn) {
   </button>
 </div>
 
-<div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-8">
+<div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+  <p className="text-xs uppercase tracking-[0.2em] text-white/40">
+    Homepage-Aufrufe
+  </p>
+
+  <p className="mt-2 text-2xl font-semibold text-white">
+    {siteViews.toLocaleString("de-AT")}
+  </p>
+</div>
   <div className="rounded-2xl border border-[#C8A96B]/20 bg-[#C8A96B]/5 p-5">
     <p className="text-xs uppercase tracking-[0.2em] text-white/40">
       Einnahmen gesamt
