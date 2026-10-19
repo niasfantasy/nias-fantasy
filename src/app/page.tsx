@@ -1395,9 +1395,7 @@ form.reset();
         className="border-y border-white/10 bg-white/[0.03] px-6 py-20 md:px-10 lg:px-16"
       >
         <div className="mx-auto max-w-4xl text-center">
-          <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[#C8A96B]">
-            Nia&apos;s Fantasy
-          </p>
+         
 
           <h2 className="mb-6 text-4xl font-semibold md:text-5xl">
             Persönlich. Diskret. Exklusiv.
@@ -1431,89 +1429,27 @@ form.reset();
           ))}
         </div>
       </section>
-{/* Q&A */}
-<section className="border-t border-white/10 px-6 py-20 md:px-10 lg:px-16">
-  <div className="mx-auto max-w-4xl">
-    <div className="mb-10 text-center">
-      <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[#C8A96B]">
-        Fragen & Antworten
-      </p>
+<section className="border-t border-white/10 px-6 py-16 md:px-10 lg:px-16">
+  <div className="mx-auto max-w-4xl text-center">
+    <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[#C8A96B]">
+      Noch Fragen?
+    </p>
 
-      <h2 className="text-4xl font-semibold md:text-5xl">
-        Q&A
-      </h2>
-    </div>
+    <h2 className="text-3xl font-semibold md:text-4xl">
+      Fragen & Antworten
+    </h2>
 
-    <div className="space-y-4">
-      <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-        <summary className="cursor-pointer font-semibold text-white">
-          Wie läuft die Personalisierung ab?
-        </summary>
+    <p className="mx-auto mt-4 max-w-2xl text-white/60">
+      Hier findest du Antworten zu Personalisierung, Proof-Pic, Versand,
+      Widerruf und Altersbeschränkung.
+    </p>
 
-        <p className="mt-4 leading-relaxed text-white/65">
-          Du gibst bei deiner Bestellung den gewünschten Namen an.
-          Das Produkt wird individuell für dich vorbereitet und entsprechend
-          der Produktbeschreibung personalisiert.
-        </p>
-      </details>
-
-      <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-        <summary className="cursor-pointer font-semibold text-white">
-          Wie erhalte ich mein Proof-Pic?
-        </summary>
-
-        <p className="mt-4 leading-relaxed text-white/65">
-          Das Proof-Pic wird nach der Anfertigung digital an die bei der
-          Bestellung angegebene E-Mail-Adresse gesendet.
-        </p>
-      </details>
-
-      <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-        <summary className="cursor-pointer font-semibold text-white">
-          Wie lange dauert die Anfertigung?
-        </summary>
-
-        <p className="mt-4 leading-relaxed text-white/65">
-          Da jedes personalisierte Produkt individuell angefertigt wird,
-          kann die Bearbeitungszeit variieren. Über den Versand wirst du
-          per E-Mail informiert.
-        </p>
-      </details>
-
-      <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-        <summary className="cursor-pointer font-semibold text-white">
-          Wie erfolgt der Versand?
-        </summary>
-
-        <p className="mt-4 leading-relaxed text-white/65">
-          Der Versand erfolgt diskret an die von dir angegebene Lieferadresse.
-          Die Versandkosten werden dir vor Abschluss der Bestellung angezeigt.
-        </p>
-      </details>
-
-      <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-        <summary className="cursor-pointer font-semibold text-white">
-          Kann ich meine Bestellung widerrufen?
-        </summary>
-
-        <p className="mt-4 leading-relaxed text-white/65">
-          Bei individuell nach deinen Angaben angefertigten Waren kann das
-          gesetzliche Rücktrittsrecht ausgeschlossen sein. Weitere
-          Informationen findest du in den AGB und auf der Widerrufsseite.
-        </p>
-      </details>
-
-      <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-        <summary className="cursor-pointer font-semibold text-white">
-          Muss ich mindestens 18 Jahre alt sein?
-        </summary>
-
-        <p className="mt-4 leading-relaxed text-white/65">
-          Ja. Das Angebot von Nia&apos;s Fantasy richtet sich ausschließlich
-          an volljährige Personen.
-        </p>
-      </details>
-    </div>
+    <a
+      href="/faq"
+      className="mt-8 inline-flex rounded-full bg-[#C8A96B] px-8 py-3 font-semibold text-black transition hover:bg-[#E2D1A2]"
+    >
+      Zum Q&A
+    </a>
   </div>
 </section>
       {/* FOOTER */}

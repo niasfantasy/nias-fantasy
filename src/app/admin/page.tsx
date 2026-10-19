@@ -6,6 +6,22 @@ export default function AdminPage() {
 const [message, setMessage] = useState("");
 const [loggedIn, setLoggedIn] = useState(false);
 const [orders, setOrders] = useState<any[]>([]);
+const [proofPicStatus, setProofPicStatus] = useState<
+  Record<number, boolean>
+>({});
+const [proofPicCodeStatus, setProofPicCodeStatus] = useState<
+  Record<number, boolean>
+>({});
+
+const [proofPicEmailStatus, setProofPicEmailStatus] = useState<
+  Record<number, boolean>
+>({});
+const [proofPicTestAccess, setProofPicTestAccess] = useState<
+  Record<number, boolean>
+>({});
+const [generatedProofPicCodes, setGeneratedProofPicCodes] = useState<
+  Record<number, string>
+>({});
 const [statusFilter, setStatusFilter] = useState("alle");
 const [sortOrder, setSortOrder] = useState("neueste");
 const [searchTerm, setSearchTerm] = useState("");
@@ -80,9 +96,271 @@ const loadSiteViews = async () => {
     );
   }
 };
+const loadProofPicStatus = async () => {
+  try {
+    const response = await fetch("/api/admin-proof-pic-status");
+
+    if (!response.ok) {
+      console.error("Proof-Pic-Status konnte nicht geladen werden.");
+      return;
+    }
+
+    const result = await response.json();
+
+    const statusMap: Record<number, boolean> = {};
+const codeStatusMap: Record<number, boolean> = {};
+const emailStatusMap: Record<number, boolean> = {};
+const testAccessMap: Record<number, boolean> = {};
+
+for (const item of result.proofPics || []) {
+  statusMap[item.orderId] = item.uploaded;
+  codeStatusMap[item.orderId] = item.codeCreated;
+  emailStatusMap[item.orderId] = item.emailSent;
+  testAccessMap[item.orderId] = item.testAccessEnabled;
+}
+
+setProofPicStatus(statusMap);
+setProofPicCodeStatus(codeStatusMap);
+setProofPicEmailStatus(emailStatusMap);
+setProofPicTestAccess(testAccessMap);
+  } catch (error) {
+    console.error("Fehler beim Laden der Proof-Pics:", error);
+  }
+};
  loadOrders();
 loadExpenses();
+loadProofPicStatus();
 }, [loggedIn]);
+const updateProofPicTestAccess = async (
+  orderId: number,
+  enabled: boolean
+) => {
+  try {
+    setMessage(
+      enabled
+        ? "Testzugriff wird aktiviert..."
+        : "Testzugriff wird deaktiviert..."
+    );
+
+    const response = await fetch("/api/admin-proof-pic-test-access", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderId,
+        enabled,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      setMessage(
+        result.error || "Testzugriff konnte nicht geändert werden."
+      );
+      return;
+    }
+
+    setProofPicTestAccess((prev) => ({
+      ...prev,
+      [orderId]: enabled,
+    }));
+
+    setMessage(
+      enabled
+        ? "Testzugriff erfolgreich aktiviert."
+        : "Testzugriff erfolgreich deaktiviert."
+    );
+  } catch (error) {
+    console.error("Fehler bei der Testfreigabe:", error);
+    setMessage("Beim Ändern des Testzugriffs ist ein Fehler aufgetreten.");
+  }
+};
+const resetProofPicCode = async (orderId: number) => {
+  const confirmed = window.confirm(
+    "Möchtest du den Freischaltcode wirklich zurücksetzen? " +
+    "Der bisherige Code wird dadurch ungültig."
+  );
+
+  if (!confirmed) return;
+
+  try {
+    setMessage("Freischaltcode wird zurückgesetzt...");
+
+    const response = await fetch("/api/admin-proof-pic-code-reset", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ orderId }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      setMessage(
+        result.error || "Freischaltcode konnte nicht zurückgesetzt werden."
+      );
+      return;
+    }
+
+    setProofPicCodeStatus((prev) => ({
+      ...prev,
+      [orderId]: false,
+    }));
+
+    setGeneratedProofPicCodes((prev) => {
+      const updated = { ...prev };
+      delete updated[orderId];
+      return updated;
+    });
+
+    setMessage(
+      "Freischaltcode zurückgesetzt. Du kannst jetzt einen neuen erstellen."
+    );
+  } catch (error) {
+    console.error("Fehler beim Zurücksetzen:", error);
+    setMessage("Beim Zurücksetzen ist ein Fehler aufgetreten.");
+  }
+};
+const sendProofPicEmail = async (orderId: number) => {
+  const accessCode = generatedProofPicCodes[orderId];
+
+  if (!accessCode) {
+    setMessage(
+      "Kein Freischaltcode verfügbar. Bitte zuerst einen Code erstellen."
+    );
+    return;
+  }
+
+  const confirmed = window.confirm(
+    "Möchtest du den Proof-Pic-Link und den Freischaltcode wirklich per E-Mail versenden?"
+  );
+
+  if (!confirmed) return;
+
+  try {
+    setMessage("Proof-Pic-E-Mail wird versendet...");
+
+    const response = await fetch("/api/admin-proof-pic-email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderId,
+        accessCode,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      setMessage(
+        result.error || "Die Proof-Pic-E-Mail konnte nicht versendet werden."
+      );
+      return;
+    }
+
+    setProofPicEmailStatus((prev) => ({
+      ...prev,
+      [orderId]: true,
+    }));
+
+    setGeneratedProofPicCodes((prev) => {
+      const updated = { ...prev };
+      delete updated[orderId];
+      return updated;
+    });
+
+    setMessage("Proof-Pic-E-Mail erfolgreich versendet.");
+  } catch (error) {
+    console.error("Fehler beim Proof-Pic-E-Mail-Versand:", error);
+
+    setMessage(
+      "Der Versandstatus ist unklar. Bitte vor einem erneuten Versuch prüfen, ob die E-Mail angekommen ist."
+    );
+  }
+};
+const generateProofPicCode = async (orderId: number) => {
+  try {
+    setMessage("Freischaltcode wird erstellt...");
+
+    const response = await fetch("/api/admin-proof-pic-code", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ orderId }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      setMessage(
+        result.error || "Freischaltcode konnte nicht erstellt werden."
+      );
+      return;
+    }
+
+    setMessage(
+      "Freischaltcode erstellt. Bitte den Code zunächst sicher notieren."
+    );
+
+    const code = String(result.accessCode || "");
+
+if (code) {
+  setGeneratedProofPicCodes((prev) => ({
+    ...prev,
+    [orderId]: code,
+  }));
+
+  setMessage(
+    "Freischaltcode erfolgreich erstellt. " +
+    "Der Code wird bei der Bestellung angezeigt."
+  );
+}
+  } catch (error) {
+    console.error("Fehler beim Erstellen des Freischaltcodes:", error);
+    setMessage("Beim Erstellen des Freischaltcodes ist ein Fehler aufgetreten.");
+  }
+};
+const uploadProofPic = async (
+  orderId: number,
+  file: File
+) => {
+  const formData = new FormData();
+
+  formData.append("orderId", String(orderId));
+  formData.append("file", file);
+
+  try {
+    setMessage("Proof-Pic wird hochgeladen...");
+
+    const response = await fetch("/api/admin-proof-pic-upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      setMessage(result.error || "Upload fehlgeschlagen.");
+      return;
+    }
+
+    setProofPicStatus((prev) => ({
+  ...prev,
+  [orderId]: true,
+}));
+
+setMessage("Proof-Pic erfolgreich gespeichert.");
+  } catch (error) {
+    console.error("Proof-Pic-Upload:", error);
+    setMessage("Beim Hochladen ist ein Fehler aufgetreten.");
+  }
+};
 const updateOrderStatus = async (orderId: number, newStatus: string) => {
   const response = await fetch("/api/admin-order-status", {
     method: "POST",
@@ -912,6 +1190,153 @@ if (loggedIn) {
       >
         <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
   <div>
+    {/* PROOF-PIC BEREICH */}
+<div className="mb-6 rounded-2xl border border-[#C8A96B]/30 bg-[#C8A96B]/5 p-5">
+  <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <p className="text-xs uppercase tracking-[0.25em] text-[#C8A96B]">
+        Proof-Pic
+      </p>
+
+      <h3 className="mt-2 text-lg font-semibold text-white">
+        Persönliches Bild zur Bestellung
+      </h3>
+    </div>
+
+    <span
+  className={`rounded-full border px-3 py-1 text-xs ${
+    proofPicStatus[order.id]
+      ? "border-green-500/30 bg-green-500/10 text-green-300"
+      : "border-white/10 bg-black text-white/50"
+  }`}
+>
+  {proofPicStatus[order.id]
+    ? "Proof-Pic gespeichert"
+    : "Noch kein Bild hochgeladen"}
+</span>
+  </div>
+
+  <p className="mb-4 text-sm leading-relaxed text-white/60">
+    Hier kannst du später das persönliche Proof-Pic für diese
+    Bestellung hochladen und den individuellen Freischaltcode verwalten.
+  </p>
+
+  <div className="flex flex-wrap gap-3">
+   <label
+  className={`inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold transition ${
+    order.status === "versendet" && !proofPicStatus[order.id]
+      ? "cursor-pointer bg-[#C8A96B] text-black hover:bg-[#E2D1A2]"
+      : "cursor-not-allowed bg-white/10 text-white/40"
+  }`}
+>
+  Bild hochladen
+
+  <input
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+    disabled={
+      order.status !== "versendet" ||
+      Boolean(proofPicStatus[order.id])
+    }
+    className="hidden"
+    onChange={async (e) => {
+      const file = e.target.files?.[0];
+
+      if (!file) return;
+
+      if (file.size > 10 * 1024 * 1024) {
+        setMessage("Das Bild darf maximal 10 MB groß sein.");
+        e.target.value = "";
+        return;
+      }
+
+      await uploadProofPic(order.id, file);
+
+      e.target.value = "";
+    }}
+  />
+</label>
+
+   
+
+   <button
+  type="button"
+  disabled={
+    order.status !== "versendet" ||
+    !proofPicStatus[order.id] ||
+    proofPicCodeStatus[order.id] ||
+    Boolean(generatedProofPicCodes[order.id])
+  }
+  onClick={() => generateProofPicCode(order.id)}
+  className={`rounded-xl border px-4 py-2 text-sm font-medium transition ${
+    order.status === "versendet" &&
+    proofPicStatus[order.id] &&
+    !proofPicCodeStatus[order.id] &&
+    !generatedProofPicCodes[order.id]
+      ? "border-[#C8A96B]/40 bg-[#C8A96B]/10 text-[#E2D1A2] hover:bg-[#C8A96B]/20"
+      : "cursor-not-allowed border-white/10 bg-white/5 text-white/30"
+  }`}
+>
+  {proofPicCodeStatus[order.id] || generatedProofPicCodes[order.id]
+    ? "Freischaltcode bereits erstellt"
+    : "Freischaltcode erstellen"}
+</button>
+{proofPicCodeStatus[order.id] &&
+  !proofPicEmailStatus[order.id] && (
+    <button
+      type="button"
+      onClick={() => resetProofPicCode(order.id)}
+      className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-300 transition hover:bg-red-500/20"
+    >
+      Code zurücksetzen
+    </button>
+  )}
+  
+  <button
+  type="button"
+  disabled
+  title="Wird nach Einrichtung der Kundenseite und Altersverifikation freigeschaltet."
+  className="cursor-not-allowed rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-white/40"
+>
+  Link & Code per E-Mail senden
+</button>
+  </div>
+
+  <p className="mt-4 text-xs text-white/40">
+    Die Funktionen werden Schritt für Schritt eingerichtet.
+    Die Bildfreigabe bleibt bis zur vollständigen Altersverifikation gesperrt.
+  </p>
+  {generatedProofPicCodes[order.id] && (
+  <div className="mt-5 rounded-xl border border-[#C8A96B]/30 bg-black/40 p-4">
+    <p className="mb-2 text-xs uppercase tracking-[0.2em] text-[#C8A96B]">
+      Individueller Freischaltcode
+    </p>
+
+    <div className="flex flex-wrap items-center gap-3">
+      <code className="rounded-lg border border-white/10 bg-black px-4 py-3 font-mono text-lg font-semibold tracking-wider text-white">
+        {generatedProofPicCodes[order.id]}
+      </code>
+
+      <button
+        type="button"
+        onClick={() =>
+          navigator.clipboard.writeText(
+            generatedProofPicCodes[order.id]
+          )
+        }
+        className="rounded-xl border border-[#C8A96B]/30 px-4 py-3 text-sm font-medium text-[#E2D1A2] transition hover:bg-[#C8A96B]/10"
+      >
+        Code kopieren
+      </button>
+    
+    </div>
+
+    <p className="mt-3 text-xs text-white/40">
+      Der Code ist nur bis zum Neuladen dieser Seite sichtbar.
+    </p>
+  </div>
+)}
+</div>
     <div className="mt-6 grid gap-6 border-t border-white/10 pt-6 md:grid-cols-2">
   <div>
     <p className="mb-2 text-xs uppercase tracking-[0.25em] text-[#C8A96B]">

@@ -33,9 +33,7 @@ export default function Datenschutz() {
 
       <section className="px-6 py-16 md:px-10 lg:px-16">
         <div className="mx-auto max-w-4xl">
-          <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[#C8A96B]">
-            Nia&apos;s Fantasy
-          </p>
+          
 
           <h1 className="mb-10 text-4xl font-semibold md:text-5xl">
             Datenschutzerklärung
